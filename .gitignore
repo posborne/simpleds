@@ -1,3 +1,7 @@
 *.out
 *.o
 *~
+.*project
+.settings
+.sconsign*
+runtests
