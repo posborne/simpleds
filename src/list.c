@@ -1,3 +1,13 @@
+/* 
+ * list.c
+ * 
+ * An implementation of an indexed list.  The interface for this list is
+ * modeled after the python standard library list as well as the Java
+ * ArrayList class.
+ * 
+ * Created On: Jan 11, 2010
+ *     Author: Paul Osborne <osbpau@gmail.com>
+ */
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
