@@ -8,6 +8,7 @@
 #include <check.h>
 #include <malloc.h>
 #include <stdio.h>
+#include "tests.h"
 #include "../src/list.h"
 
 /** TEST UTILITY FUNCTIONS **/
@@ -301,7 +302,7 @@ list_suite(void) {
 	Suite *s = suite_create("List");
 	
 	/* Core test case */
-	TCase *tc_core = tcase_create("Core");
+	TCase *tc_core = tcase_create("List");
 	tcase_add_test(tc_core, test_list_create);
 	tcase_add_test(tc_core, test_list_create_heap_size);
 	tcase_add_test(tc_core, test_list_create_static);
@@ -318,16 +319,4 @@ list_suite(void) {
 	
 	suite_add_tcase(s, tc_core);
 	return s;
-}
-
-int
-main(void) {
-	int number_failed;
-	Suite *s = list_suite();
-	SRunner *sr = srunner_create(s);
-	
-	srunner_run_all(sr, CK_NOFORK);
-	number_failed = srunner_ntests_failed(sr);
-	srunner_free(sr);
-	return (number_failed == 0) ? 0 : 1;
 }
