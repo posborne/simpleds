@@ -5,3 +5,4 @@
 .settings
 .sconsign*
 runtests
+build

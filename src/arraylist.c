@@ -13,9 +13,9 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-#include "list.h"
+#include "arraylist.h"
 
-#define DEFAULT_LIST_SIZE 10
+#define DEFAULT_ARRAYLIST_SIZE 10
 
 /*
  *  Module Local Function Prototypes and MACROS
@@ -24,10 +24,10 @@ inline void PTR_SWAP(void **a, void **b) {void *t = *a; *a = *b; *b = t;}
 
 /* Check to see if we need to expand the ptr_table */
 static uint8_t
-list_memcheck(ArrayList list) {
+arraylist_memcheck(ArrayList list) {
 	if (list->capacity - list->number_items <= 0) {
-		if (list->list_type == LIST_TYPE_FIXED) {
-			return LIST_ERROR;
+		if (list->list_type == ARRAYLIST_TYPE_FIXED) {
+			return ARRAYLIST_ERROR;
 		} else {
 			/* double the amount of memory allocated */
 			void *new_table = malloc(sizeof(void*) * 2 * list->capacity);
@@ -38,27 +38,27 @@ list_memcheck(ArrayList list) {
 		}
 	}
 	assert(list->capacity - list->number_items > 0);
-	return LIST_SUCCESS;
+	return ARRAYLIST_SUCCESS;
 }
 
 /*
  * Interface function implementations
  */
 ArrayList
-list_create() {
-	return list_create_heap();
+arraylist_create() {
+	return arraylist_create_heap();
 }
 
 /* Create an arraylist with memory allocated on the heap.
  * 
- * This function calls list_create_heap_size() under the hood with a starting
+ * This function calls arraylist_create_heap_size() under the hood with a starting
  * list size of 10.  If the list size is known to be much different than this
- * it is recommended to called list_create_heap_size() directly as this will
+ * it is recommended to called arraylist_create_heap_size() directly as this will
  * reduce the number of memory reallocations that need to be performed.
  */
 ArrayList
-list_create_heap() {
-	return list_create_heap_size(DEFAULT_LIST_SIZE);
+arraylist_create_heap() {
+	return arraylist_create_heap_size(DEFAULT_ARRAYLIST_SIZE);
 }
 
 /* Create a list with memory allocated on the heap
@@ -69,19 +69,19 @@ list_create_heap() {
  * large enough for all data will reduce the number of expensive memory
  * reallocations that are needed.
  * 
- * When done with a list, list_free() should be called in order to prevent
+ * When done with a list, arraylist_free() should be called in order to prevent
  * a memory leak.  This will free that data structures used to track the list
  * items, but it will not free the elements referenced by the list.
  */
 ArrayList
-list_create_heap_size(const uint32_t items) {
+arraylist_create_heap_size(const uint32_t items) {
 	/* allocate memory for items buckets */
 	ArrayList list = malloc(sizeof(ListType));
 	void *ptr_table = malloc(items * sizeof(void*));
 	list->ptr_table = ptr_table;
 	list->number_items = 0;
 	list->capacity = items;
-	list->list_type = LIST_TYPE_EXPANDING;
+	list->list_type = ARRAYLIST_TYPE_EXPANDING;
 	return list;
 }
 
@@ -98,47 +98,47 @@ list_create_heap_size(const uint32_t items) {
  * and copy the data to a new list with more memory allocated.
  */
 ArrayList
-list_create_static(const void *dataPtr, const uint32_t size) {
+arraylist_create_static(const void *dataPtr, const uint32_t size) {
 	ArrayList list = malloc(sizeof(ListType));
 	list->ptr_table = (void*) dataPtr;
 	list->number_items = 0;
 	list->capacity = size;
-	list->list_type = LIST_TYPE_FIXED;
+	list->list_type = ARRAYLIST_TYPE_FIXED;
 	return list;
 }
 
 /* Free the list and the list's pointer buffer
  * 
- * list_free() will not free objects referenced in the list, if the list is the
+ * arraylist_free() will not free objects referenced in the list, if the list is the
  * only reference to these objects, the user should walk through the list and
  * free all of these objects first.
  */
 uint8_t
-list_free(ArrayList list) {
+arraylist_free(ArrayList list) {
 	free(list->ptr_table);
 	free(list);
-	return LIST_SUCCESS;
+	return ARRAYLIST_SUCCESS;
 }
 
 /* Append the specified item to the list
  * 
  * If this list was allocated on the heap, the list will automatically expand
  * as needed to fit the new data.  If not, the function call will return an
- * error code, most likely LIST_ERROR.  LIST_SUCCESS indicates that the append
+ * error code, most likely ARRAYLIST_ERROR.  ARRAYLIST_SUCCESS indicates that the append
  * completed successfully.
  */
 uint8_t
-list_append(ArrayList list, void *item) {
+arraylist_append(ArrayList list, void *item) {
 	/* make sure we have the room to expand */
 	uint8_t result_code;
-	if ((result_code = list_memcheck(list)) != LIST_SUCCESS) {
+	if ((result_code = arraylist_memcheck(list)) != ARRAYLIST_SUCCESS) {
 		return result_code;
 	}
 
 	/* all clear at this point, append away */
 	list->ptr_table[list->number_items] = item;
 	list->number_items++;
-	return LIST_SUCCESS;
+	return ARRAYLIST_SUCCESS;
 }
 
 /* Extend a list by appending all the elements from a second list
@@ -148,19 +148,19 @@ list_append(ArrayList list, void *item) {
  * for lists whose buffer was allocated on the heap.
  */
 uint8_t
-list_extend(ArrayList list, const ArrayList appendList) {
+arraylist_extend(ArrayList list, const ArrayList appendList) {
 	int i;
 	/* Do we have enough room to go through with this for fixed size? */
-	if (list->list_type == LIST_TYPE_FIXED && list->capacity
+	if (list->list_type == ARRAYLIST_TYPE_FIXED && list->capacity
 			< (list->number_items + appendList->number_items)) {
-		return LIST_ERROR;
+		return ARRAYLIST_ERROR;
 	}
 
 	/* append each of the items from the second list */
 	for (i = 0; i < appendList->number_items; i++) {
-		list_append(list, list_getitem(appendList, i));
+		arraylist_append(list, arraylist_getitem(appendList, i));
 	}
-	return LIST_SUCCESS;
+	return ARRAYLIST_SUCCESS;
 }
 
 /* Get the item at the specified index
@@ -168,7 +168,7 @@ list_extend(ArrayList list, const ArrayList appendList) {
  * If the index is out of bounds, return NULL.
  */
 void*
-list_getitem(ArrayList list, const int index) {
+arraylist_getitem(ArrayList list, const int index) {
 	if (index > list->number_items) {
 		return NULL;
 	} else {
@@ -188,17 +188,17 @@ list_getitem(ArrayList list, const int index) {
  * data structure such as a stack, queue, or deque.
  */
 uint8_t
-list_insert(ArrayList list, const int insert_index, void *item) {
+arraylist_insert(ArrayList list, const int insert_index, void *item) {
 	int i;
 	uint8_t result_code;
 
 	/* i in valid range? */
 	if (insert_index < 0 || insert_index > list->number_items) {
-		return LIST_INDEX_ERROR;
+		return ARRAYLIST_INDEX_ERROR;
 	}
 
 	/* expand ptr_table if needed */
-	if ((result_code = list_memcheck(list)) != LIST_SUCCESS) {
+	if ((result_code = arraylist_memcheck(list)) != ARRAYLIST_SUCCESS) {
 		return result_code;
 	}
 
@@ -210,7 +210,7 @@ list_insert(ArrayList list, const int insert_index, void *item) {
 	list->ptr_table[insert_index] = item;
 	list->number_items++;
 
-	return LIST_SUCCESS;
+	return ARRAYLIST_SUCCESS;
 }
 
 /* Remove the first instance of item from the list
@@ -221,13 +221,13 @@ list_insert(ArrayList list, const int insert_index, void *item) {
  * of the list updated to maintain list invariants.
  */
 void*
-list_remove(ArrayList list, const void* item) {
+arraylist_remove(ArrayList list, const void* item) {
 	int i;
 	void **tmp;
 	for (i = 0; i < list->number_items; i++) {
 		tmp = list->ptr_table[i];
 		if (tmp == item) {
-			return list_pop_item(list, i);
+			return arraylist_pop_item(list, i);
 		}
 	}
 	return NULL;
@@ -239,13 +239,13 @@ list_remove(ArrayList list, const void* item) {
  * the list has no elements, NULL will be returned.
  */
 void*
-list_pop(ArrayList list) {
-	return list_pop_item(list, list->number_items - 1);
+arraylist_pop(ArrayList list) {
+	return arraylist_pop_item(list, list->number_items - 1);
 }
 
 /* Pop the item at the specified index and assign it to item */
 void*
-list_pop_item(ArrayList list, const int popIndex) {
+arraylist_pop_item(ArrayList list, const int popIndex) {
 	int i;
 	void* popped_item = NULL;
 	if (popIndex < 0 || popIndex >= list->number_items) {
@@ -270,7 +270,7 @@ list_pop_item(ArrayList list, const int popIndex) {
  * index, then -1 is returned.
  */
 int32_t
-list_index(ArrayList list, const void *item) {
+arraylist_index(ArrayList list, const void *item) {
 	int i;
 	for (i = 0; i < list->number_items; i++) {
 		if (list->ptr_table[i] == item) {
@@ -282,13 +282,13 @@ list_index(ArrayList list, const void *item) {
 
 /* Return the number of items in the list */
 uint32_t
-list_count(ArrayList list) {
+arraylist_count(ArrayList list) {
 	return list->number_items;
 }
 
 /* Reverse the list in place */
 void
-list_reverse(ArrayList list) {
+arraylist_reverse(ArrayList list) {
 	int i;
 	int lastIndex = list->number_items - 1;
 	for (i = 0; i < (lastIndex + 1) / 2; i++) {
@@ -336,12 +336,12 @@ quicksort_partition(ArrayList list, int8_t(*compare_func)(void*, void*),
  * O(1) with regards to space.
  */
 void
-list_quicksort(ArrayList list, int8_t(*compare_func)(void*, void*),
+arraylist_quicksort(ArrayList list, int8_t(*compare_func)(void*, void*),
 			   uint32_t leftIndex, uint32_t rightIndex) {
 	if (leftIndex < rightIndex) {
 		uint32_t pivotOn = quicksort_partition(list, compare_func, leftIndex, rightIndex);
-		list_quicksort(list, compare_func, leftIndex, pivotOn); /* left side */
-		list_quicksort(list, compare_func, pivotOn + 1, rightIndex); /* right side */
+		arraylist_quicksort(list, compare_func, leftIndex, pivotOn); /* left side */
+		arraylist_quicksort(list, compare_func, pivotOn + 1, rightIndex); /* right side */
 	}
 }
 
@@ -351,6 +351,6 @@ list_quicksort(ArrayList list, int8_t(*compare_func)(void*, void*),
  * use cases.
  */
 void
-list_sort(ArrayList list, int8_t(*compare_func)(void*, void*)) {
-	list_quicksort(list, compare_func, 0, list->number_items - 1);
+arraylist_sort(ArrayList list, int8_t(*compare_func)(void*, void*)) {
+	arraylist_quicksort(list, compare_func, 0, list->number_items - 1);
 }

@@ -11,7 +11,7 @@
 #ifndef TESTS_H_
 #define TESTS_H_
 
-Suite* list_suite(void);
+Suite* arraylist_suite(void);
 Suite* deque_suite(void);
 
 #endif /* TESTS_H_ */

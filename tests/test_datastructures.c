@@ -10,7 +10,7 @@
 int
 main(void) {
 	int number_failed;
-	SRunner *sr = srunner_create(list_suite());
+	SRunner *sr = srunner_create(arraylist_suite());
 	srunner_add_suite(sr, deque_suite());
 	
 	srunner_run_all(sr, CK_NOFORK);
