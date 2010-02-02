@@ -1,0 +1,49 @@
+     _                 _          _     
+ ___(_)_ __ ___  _ __ | | ___  __| |___ 
+/ __| | '_ ` _ \| '_ \| |/ _ \/ _` / __|
+\__ \ | | | | | | |_) | |  __/ (_| \__ \
+|___/_|_| |_| |_| .__/|_|\___|\__,_|___/
+                |_|                     
+
+== INTRODUCTION ==
+
+Simpleds is a collection of data structures (and som associated algorithms)
+implemented in plain, portable C code.  The main considerations in
+implementing these data structures are as follows:
+
+  1. Portability:
+     These data structures should not depend on external libraries which are
+     not part of the standard C library unless absolutely required.  Within
+     the code itself interdependencies shall be kept to a minimum.  It should
+     be easy to remove code from the project and drop it into (modifying as needed)
+     whatever project the user is currently working on.
+
+  2. Correctness:
+     If the library is to be usable it must be correct.  A central part of simpleds
+     is the unit tests (this project uses check as a unit testing framework).  Beyond
+     the unit tests, effort has been taken to reference known-working implementations
+     of data structures.
+
+  3. Ease of Use (consistency):
+     The interfaces for the simpleds modules are inspired and often match the
+     interfaces found in the python collections module (and standard library).
+     To the extent possible, the naming and calling conventions for implemented
+     modules shall be consistent and intuitive for any moderately well-versed
+     C programmer.
+
+== INSTALLATION ==
+
+Simpleds can be compiled into either a statically or dynamically linked library,
+but we expect the most common usage of the library will be for modules to be
+copied from simpleds and used in individuals own projects.  The code is licensed
+under a very pervasive MIT-style license, we only ask that the header for each of
+the files remains intact.
+
+For building and working on the project, we use the scons build system.  Read up
+on scons and checkout out the SConstruct file.
+
+== CONTACT ==
+
+Issues can be posted at the project homepage: http://github.com/posborne/simpleds
+If you have other questions, feel free to message me on github, I would love to
+repond and help out however possible.
