@@ -7,7 +7,7 @@
 
 == INTRODUCTION ==
 
-Simpleds is a collection of data structures (and som associated algorithms)
+Simpleds is a collection of data structures (and some associated algorithms)
 implemented in plain, portable C code.  The main considerations in
 implementing these data structures are as follows:
 
