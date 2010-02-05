@@ -2,54 +2,167 @@
 #include "../src/deque.h"
 
 START_TEST (test_deque_create) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	fail_if(d == NULL);
+	fail_unless(d->number_items == 0);
+	fail_unless(d->head == NULL);
+	fail_unless(d->tail == NULL);
+	deque_free(d);
 }
 END_TEST
 
 
 START_TEST (test_deque_append) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	fail_unless(test_strings[2] == deque_pop(d));
+	fail_unless(test_strings[1] == deque_pop(d));
+	fail_unless(test_strings[0] == deque_pop(d));
+	deque_free(d);
 }
 END_TEST
 
 
 START_TEST (test_deque_appendleft) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	deque_appendleft(d, test_strings[0]);
+	deque_appendleft(d, test_strings[1]);
+	deque_appendleft(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	fail_unless(test_strings[0] == deque_pop(d));
+	fail_unless(test_strings[1] == deque_pop(d));
+	fail_unless(test_strings[2] == deque_pop(d));
+	deque_free(d);
 }
 END_TEST
 
 START_TEST (test_deque_clear) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	deque_appendleft(d, test_strings[0]);
+	deque_appendleft(d, test_strings[1]);
+	deque_appendleft(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	deque_clear(d);
+	fail_unless(deque_count(d) == 0);
+	fail_unless(d->head == NULL);
+	fail_unless(d->tail == NULL);
+	deque_free(d);
 }
 END_TEST
 
 START_TEST (test_deque_pop) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	fail_unless(test_strings[2] == deque_pop(d));
+	fail_unless(test_strings[1] == deque_pop(d));
+	fail_unless(test_strings[0] == deque_pop(d));
+	deque_free(d);
 }
 END_TEST
 
 START_TEST (test_deque_popleft) {
-	fail("Not Implemented");	
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	fail_unless(test_strings[0] == deque_popleft(d));
+	fail_unless(test_strings[1] == deque_popleft(d));
+	fail_unless(test_strings[2] == deque_popleft(d));
+	deque_free(d);
 }
 END_TEST
 
 START_TEST (test_deque_remove) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	char* notfound = "Not in there";
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	fail_unless(deque_remove(d, notfound) == NULL);
+	fail_unless(deque_count(d) == 3);
+	
+	fail_unless(deque_remove(d, test_strings[1]) == test_strings[1]);
+	fail_unless(deque_count(d) == 2);
+	
+	fail_unless(deque_remove(d, test_strings[3]) == test_strings[3]);
+	fail_unless(deque_count(d) == 1);
 }
 END_TEST
 
 START_TEST (test_deque_rotate) {
-	fail("Not Implemented");
+	Deque d = deque_create();
+	char* ts[] = {"t1", "t2", "t3"};
+	deque_append(d, ts[0]);
+	deque_append(d, ts[1]);
+	deque_append(d, ts[2]);
+	
+	/* slide to the right */
+	fail_unless(deque_peek(d) == ts[2]);
+	deque_rotate(d, 1);
+	fail_unless(deque_peek(d) == ts[1]);
+	
+	/* slide to the left */
+	deque_rotate(d, -1);
+	fail_unless(deque_peek(d) == ts[2]);
+	
+	/* slide two to the right */
+	deque_rotate(d, 2);
+	fail_unless(deque_peek(d) == ts[0]);
+	
+	/* slide two again */
+	deque_rotate(d, 2);
+	fail_unless(deque_peek(d) == ts[1]);
 }
 END_TEST
 
 START_TEST (test_deque_count) {
-	fail("Not Implemented");
+	char* test_strings[] = {"t1", "t2", "t3"};
+	Deque d = deque_create();
+	
+	fail_unless(deque_count(d) == 0);
+	
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	deque_free(d);
 }
 END_TEST
 
 START_TEST (test_deque_copy) {
-	fail("Not Implemented");
+	Deque dcopy;
+	Deque d = deque_create();
+	char* test_strings[] = {"t1", "t2", "t3"};
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+
+	dcopy = deque_copy(d);
+	fail_unless(deque_count(d) == 3);
+	
+	deque_free(dcopy);
+	deque_free(d);
 }
 END_TEST
 
