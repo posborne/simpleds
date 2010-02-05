@@ -32,7 +32,7 @@ int arraylist_index(ArrayList list, const void* item);
 uint32_t arraylist_count(ArrayList list);
 void arraylist_reverse(ListType *listPtr);
 void arraylist_quicksort(ArrayList list, int8_t(*compare_func)(void*, void*), 
-			 uint32_t left, uint32_t right);
+						 uint32_t left, uint32_t right);
 void arraylist_sort(ArrayList list, int8_t(*compare_func)(void*, void*));
 
 #endif
