@@ -13,19 +13,6 @@
 #include "../src/arraylist.h"
 
 /** TEST UTILITY FUNCTIONS **/
-static ArrayList
-create_string_list(int num_items) {
-	int i;
-	ArrayList l;
-	l = arraylist_create();
-	for (i = 0; i < num_items; i++) {
-		char* tmp = malloc(sizeof(char) * 10);
-		sprintf(tmp, "item %d", i);
-		arraylist_append(l, tmp);
-	}
-	return l;
-}
-
 char*
 string_listing(ArrayList l) {
 	int i;
@@ -45,6 +32,27 @@ string_listing(ArrayList l) {
 	return bigbuff;
 }
 
+static int8_t
+string_comparator(void* a, void* b) {
+	/*
+	printf("Comparing \"%s\" and \"%s\" => %d\n", (char*)a, (char*)b, strcmp((char*)a, (char*) b));
+	*/
+	return (int8_t) strcmp((char*)a, (char*)b);
+}
+
+static ArrayList
+create_string_list(int num_items) {
+	int i;
+	ArrayList l;
+	l = arraylist_create(string_comparator);
+	for (i = 0; i < num_items; i++) {
+		char* tmp = malloc(sizeof(char) * 10);
+		sprintf(tmp, "item %d", i);
+		arraylist_append(l, tmp);
+	}
+	return l;
+}
+
 void
 print_listing(ArrayList l) {
 	int i;
@@ -61,7 +69,7 @@ print_listing(ArrayList l) {
 /* arraylist_create */
 START_TEST (test_arraylist_create) {
 	ArrayList l;
-	l = arraylist_create();
+	l = arraylist_create(string_comparator);
 	fail_unless(l != NULL, "List was not created");
 	fail_unless(arraylist_count(l) == 0, "List should start with count 0");
 	fail_unless(l->capacity == 10, "Capacity not 10, update docs");
@@ -72,7 +80,7 @@ END_TEST
 /* arraylist_create_heap_size */
 START_TEST (test_arraylist_create_heap_size) {
 	ArrayList l;
-	l = arraylist_create_heap_size(10000);
+	l = arraylist_create_heap_size(10000, string_comparator);
 	fail_unless(l != NULL, "List was not created");
 	fail_unless(arraylist_count(l) == 0, "List should have no items");
 	fail_unless(l->capacity == 10000, "List has incorrect capacity");
@@ -83,7 +91,7 @@ END_TEST
 /* arraylist_create_static */
 START_TEST (test_arraylist_create_static) {
 	void* buf[1000];
-	ArrayList l = arraylist_create_static(buf, 1000);
+	ArrayList l = arraylist_create_static(buf, 1000, string_comparator);
 	fail_unless(l != NULL, "List was not created");
 	fail_unless(l->capacity == 1000, "Capacity is not correct");
 	fail_unless(arraylist_count(l) == 0, "List should not have any items");
@@ -161,7 +169,7 @@ START_TEST (test_arraylist_remove) {
 	char item1[] = "item 1";
 	char item2[] = "item 2";
 	char item3[] = "item 3";
-	ArrayList l = arraylist_create();
+	ArrayList l = arraylist_create(string_comparator);
 	arraylist_append(l, item1);
 	arraylist_append(l, item2);
 	arraylist_append(l, item3);
@@ -181,7 +189,7 @@ START_TEST (test_arraylist_pop) {
 	char item1[] = "item 1";
 	char item2[] = "item 2";
 	char item3[] = "item 3";
-	ArrayList l = arraylist_create();
+	ArrayList l = arraylist_create(string_comparator);
 	arraylist_append(l, item1);
 	arraylist_append(l, item2);
 	arraylist_append(l, item3);
@@ -201,7 +209,7 @@ START_TEST (test_arraylist_pop_item) {
 	char item1[] = "item 1";
 	char item2[] = "item 2";
 	char item3[] = "item 3";
-	ArrayList l = arraylist_create();
+	ArrayList l = arraylist_create(string_comparator);
 	arraylist_append(l, item1);
 	arraylist_append(l, item2);
 	arraylist_append(l, item3);
@@ -221,7 +229,7 @@ START_TEST (test_arraylist_index) {
 	char item1[] = "item 1";
 	char item2[] = "item 2";
 	char item3[] = "item 3";
-	ArrayList l = arraylist_create();
+	ArrayList l = arraylist_create(string_comparator);
 	arraylist_append(l, item1);
 	arraylist_append(l, item2);
 	arraylist_append(l, item3);
@@ -250,14 +258,6 @@ START_TEST (test_arraylist_reverse) {
 	arraylist_free(l);
 }
 END_TEST
-
-static int8_t
-string_comparator(void* a, void* b) {
-	/*
-	printf("Comparing \"%s\" and \"%s\" => %d\n", (char*)a, (char*)b, strcmp((char*)a, (char*) b));
-	*/
-	return (int8_t) strcmp((char*)a, (char*)b);
-}
 
 /* arraylist_quicksort */
 START_TEST (test_arraylist_quicksort) {
@@ -288,12 +288,12 @@ START_TEST (test_arraylist_quicksort) {
 	};
 	
 	/* create the list and add unordered words */
-	l = arraylist_create();
+	l = arraylist_create(string_comparator);
 	for (i = 0; i < 9; i++) {
 		arraylist_append(l, unordered_words[i]);
 	}
 	
-	arraylist_sort(l, &string_comparator);
+	arraylist_sort(l);
 	for (i = 0; i < 9; i++) {
 		fail_unless(strcmp((char*)arraylist_getitem(l, i), ordered_words[i]) == 0);
 	}
