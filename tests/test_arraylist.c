@@ -236,9 +236,13 @@ START_TEST (test_arraylist_index) {
 	
 	fail_unless(arraylist_count(l) == 3, "Setup Failed");
 	fail_unless(arraylist_index(l, item1) == 0);
+	fail_unless(arraylist_contains(l, item1));
 	fail_unless(arraylist_index(l, item2) == 1);
+	fail_unless(arraylist_contains(l, item2));
 	fail_unless(arraylist_index(l, item3) == 2);
+	fail_unless(arraylist_contains(l, item3));
 	fail_unless(arraylist_index(l, "Foobar") == -1);
+	fail_if(arraylist_contains(l, "Foobar"));
 	
 	arraylist_free(l);
 }

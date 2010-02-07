@@ -27,7 +27,8 @@ inline void PTR_SWAP(void **a, void **b) {
 }
 
 /* Check to see if we need to expand the ptr_table */
-static uint8_t arraylist_memcheck(ArrayList list) {
+static uint8_t
+arraylist_memcheck(ArrayList list) {
 	if (list->capacity - list->number_items <= 0) {
 		if (list->list_type == ARRAYLIST_TYPE_FIXED) {
 			return ARRAYLIST_ERROR;
@@ -47,7 +48,8 @@ static uint8_t arraylist_memcheck(ArrayList list) {
 /*
  * Interface function implementations
  */
-ArrayList arraylist_create(int8_t(*compare_func)(void*, void*)) {
+ArrayList
+arraylist_create(int8_t(*compare_func)(void*, void*)) {
 	return arraylist_create_heap(compare_func);
 }
 
@@ -58,7 +60,8 @@ ArrayList arraylist_create(int8_t(*compare_func)(void*, void*)) {
  * it is recommended to called arraylist_create_heap_size() directly as this will
  * reduce the number of memory reallocations that need to be performed.
  */
-ArrayList arraylist_create_heap(int8_t(*compare_func)(void*, void*)) {
+ArrayList
+arraylist_create_heap(int8_t(*compare_func)(void*, void*)) {
 	return arraylist_create_heap_size(DEFAULT_ARRAYLIST_SIZE, compare_func);
 }
 
@@ -74,7 +77,8 @@ ArrayList arraylist_create_heap(int8_t(*compare_func)(void*, void*)) {
  * a memory leak.  This will free that data structures used to track the list
  * items, but it will not free the elements referenced by the list.
  */
-ArrayList arraylist_create_heap_size(const uint32_t items,
+ArrayList
+arraylist_create_heap_size(const uint32_t items,
 									 int8_t(*compare_func)(void*, void*)) {
 	/* allocate memory for items buckets */
 	ArrayList list = malloc(sizeof(ListType));
@@ -99,7 +103,8 @@ ArrayList arraylist_create_heap_size(const uint32_t items,
  * exceed the size of the buffer allocated or to catch the error when it happens
  * and copy the data to a new list with more memory allocated.
  */
-ArrayList arraylist_create_static(const void *dataPtr, const uint32_t size,
+ArrayList
+arraylist_create_static(const void *dataPtr, const uint32_t size,
 		int8_t(*compare_func)(void*, void*)) {
 	ArrayList list = malloc(sizeof(ListType));
 	list->ptr_table = (void*) dataPtr;
@@ -116,7 +121,8 @@ ArrayList arraylist_create_static(const void *dataPtr, const uint32_t size,
  * only reference to these objects, the user should walk through the list and
  * free all of these objects first.
  */
-uint8_t arraylist_free(ArrayList list) {
+uint8_t
+arraylist_free(ArrayList list) {
 	free(list->ptr_table);
 	free(list);
 	return ARRAYLIST_SUCCESS;
@@ -129,7 +135,8 @@ uint8_t arraylist_free(ArrayList list) {
  * error code, most likely ARRAYLIST_ERROR.  ARRAYLIST_SUCCESS indicates that the append
  * completed successfully.
  */
-uint8_t arraylist_append(ArrayList list, void *item) {
+uint8_t
+arraylist_append(ArrayList list, void *item) {
 	/* make sure we have the room to expand */
 	uint8_t result_code;
 	if ((result_code = arraylist_memcheck(list)) != ARRAYLIST_SUCCESS) {
@@ -148,7 +155,8 @@ uint8_t arraylist_append(ArrayList list, void *item) {
  * returned if the allocated space runs out.  Additional space will be allocated
  * for lists whose buffer was allocated on the heap.
  */
-uint8_t arraylist_extend(ArrayList list, const ArrayList appendList) {
+uint8_t
+arraylist_extend(ArrayList list, const ArrayList appendList) {
 	int i;
 	/* Do we have enough room to go through with this for fixed size? */
 	if (list->list_type == ARRAYLIST_TYPE_FIXED && list->capacity
@@ -187,7 +195,8 @@ arraylist_getitem(ArrayList list, const int index) {
  * an operation that needs to be performed often, consider uisng a different
  * data structure such as a stack, queue, or deque.
  */
-uint8_t arraylist_insert(ArrayList list, const int insert_index, void *item) {
+uint8_t
+arraylist_insert(ArrayList list, const int insert_index, void *item) {
 	int i;
 	uint8_t result_code;
 
@@ -268,7 +277,8 @@ arraylist_pop_item(ArrayList list, const int popIndex) {
  * If an item cannot be found in the list that does not match the specified
  * index, then -1 is returned.
  */
-int32_t arraylist_index(ArrayList list, const void *item) {
+int32_t
+arraylist_index(ArrayList list, const void *item) {
 	int i;
 	for (i = 0; i < list->number_items; i++) {
 		if (list->ptr_table[i] == item) {
@@ -279,17 +289,28 @@ int32_t arraylist_index(ArrayList list, const void *item) {
 }
 
 /* Return the number of items in the list */
-uint32_t arraylist_count(ArrayList list) {
+uint32_t
+arraylist_count(ArrayList list) {
 	return list->number_items;
 }
 
 /* Reverse the list in place */
-void arraylist_reverse(ArrayList list) {
+void
+arraylist_reverse(ArrayList list) {
 	int i;
 	int lastIndex = list->number_items - 1;
 	for (i = 0; i < (lastIndex + 1) / 2; i++) {
 		PTR_SWAP(&list->ptr_table[i], &list->ptr_table[lastIndex - i]);
 	}
+}
+
+/* Determine whether the arraylist contains the specified item 
+ * 
+ * Return TRUE (1), if the value is in arraylist and FALSE (0) if not.
+ */
+uint8_t
+arraylist_contains(ArrayList list, void *item) {
+	return arraylist_index(list, item) >= 0;
 }
 
 /* Perform the quicksort partition step for in-place quicksort
@@ -300,7 +321,8 @@ void arraylist_reverse(ArrayList list) {
  * in the list right of the pivot will be greater than or equal to the
  * pivot value.  The function returns the final storeIndex.
  */
-static uint32_t quicksort_partition(ArrayList list, uint32_t left, uint32_t right) {
+static uint32_t
+quicksort_partition(ArrayList list, uint32_t left, uint32_t right) {
 	uint32_t i, j, pivotIndex;
 	void* pivot;
 	j = left;
@@ -329,7 +351,8 @@ static uint32_t quicksort_partition(ArrayList list, uint32_t left, uint32_t righ
  * implementation which is not done in-place.  Also, this implementation is
  * O(1) with regards to space.
  */
-void arraylist_quicksort(ArrayList list, uint32_t leftIndex, uint32_t rightIndex) {
+void
+arraylist_quicksort(ArrayList list, uint32_t leftIndex, uint32_t rightIndex) {
 	if (leftIndex < rightIndex) {
 		uint32_t pivotOn = quicksort_partition(list, leftIndex, rightIndex);
 		arraylist_quicksort(list, leftIndex, pivotOn); /* left side */
@@ -342,6 +365,7 @@ void arraylist_quicksort(ArrayList list, uint32_t leftIndex, uint32_t rightIndex
  * The default sort used is an in-place quicksort which does very well in most
  * use cases.
  */
-void arraylist_sort(ArrayList list) {
+void
+arraylist_sort(ArrayList list) {
 	arraylist_quicksort(list, 0, list->number_items - 1);
 }

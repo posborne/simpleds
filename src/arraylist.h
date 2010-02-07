@@ -32,6 +32,7 @@ void* arraylist_remove(ArrayList list, const void *item);
 void* arraylist_pop(ArrayList list);
 void* arraylist_pop_item(ArrayList list, const int index);
 int arraylist_index(ArrayList list, const void* item);
+uint8_t arraylist_contains(ArrayList list, void *item);
 uint32_t arraylist_count(ArrayList list);
 void arraylist_reverse(ListType *listPtr);
 void arraylist_quicksort(ArrayList list, uint32_t left, uint32_t right);
