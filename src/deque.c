@@ -41,11 +41,19 @@ uint8_t
 deque_append(Deque d, void* item) {
 	DequeNode newNode;
 	assert(d != NULL);
+	
+	/* allocate memory for the new node and put it in a valid state */
 	newNode = malloc(sizeof(struct deque_node_t));
 	newNode->prev = d->head;
 	newNode->next = NULL;
 	newNode->value = item;
 	
+	if (d->head != NULL) {
+		d->head->next = newNode;
+	}
+	if (d->tail == NULL) {
+		d->tail = newNode; /* only one item */
+	}
 	d->head = newNode;
 	d->number_items++;
 	return DEQUE_SUCCESS;
@@ -57,15 +65,20 @@ uint8_t
 deque_appendleft(Deque d, void* item) {
 	DequeNode newNode;
 	assert(d != NULL);
+	
+	/* create the new node and put it in a valid state */
 	newNode = malloc(sizeof(struct deque_node_t));
 	newNode->next = d->tail;
 	newNode->prev = NULL;
 	newNode->value = item;
 	
-	d->tail = newNode;
+	if (d->tail != NULL) {
+		d->tail->prev = newNode;
+	}
 	if (d->head == NULL) {
 		d->head = d->tail;
 	}
+	d->tail = newNode;
 	d->number_items++;
 	return DEQUE_SUCCESS;
 }
@@ -79,7 +92,8 @@ uint8_t
 deque_clear(Deque d) {
 	DequeNode tmp;
 	assert(d != NULL);
-	while ((tmp = d->head) != NULL) {
+	while (d->head != NULL) {
+		tmp = d->head;
 		d->head = tmp->next;
 		free(tmp);
 	}
@@ -130,10 +144,14 @@ void*
 deque_popleft(Deque d) {
 	DequeNode prevTail;
 	void* value;
-	if ((prevTail = d->tail) == NULL) {
+	if (d->tail == NULL) {
 		return NULL;
 	} else {
+		prevTail = d->tail;
 		d->tail = prevTail->next;
+		if (d->tail != NULL) {
+			d->tail->prev = NULL;
+		}
 		d->number_items--;
 		value = prevTail->value;
 		free(prevTail);
@@ -165,12 +183,12 @@ deque_peekleft(Deque d) {
 void*
 deque_remove(Deque d, void* item) {
 	void* value;
-	DequeNode tmp = d->head;
+	DequeNode tmp = d->tail;
 	while (tmp != NULL) {
-		if (tmp == item) {
+		if (tmp->value == item) {
 			value = tmp->value;
 			if (tmp->prev != NULL) {
-				tmp->prev = tmp->next;
+				tmp->prev->next = tmp->next;
 			}
 			if (tmp->next != NULL) {
 				tmp->next->prev = tmp->prev;
@@ -206,7 +224,7 @@ deque_rotate(Deque d, int32_t n) {
 	if (n > 0) {
 		deque_rotateright(d, n);
 	} else if (n < 0) {
-		deque_rotateleft(d, n);
+		deque_rotateleft(d, abs(n));
 	}
 }
 
@@ -229,6 +247,7 @@ deque_rotateright(Deque d, uint32_t n) {
 		
 		tmp->next = d->tail;
 		tmp->prev = NULL;
+		d->tail->prev = tmp;
 		d->tail = tmp;
 	}
 }
@@ -252,6 +271,7 @@ deque_rotateleft(Deque d, uint32_t n) {
 		
 		tmp->prev = d->head;
 		tmp->next = NULL;
+		d->head->next = tmp;
 		d->head = tmp;
 	}
 }
@@ -302,12 +322,13 @@ deque_reverse(Deque d) {
 /* Return TRUE if the deque contains the specified item and FALSE if not */
 uint8_t
 deque_contains(Deque d, void* item) {
-	DequeNode tmp = d->head;
+	DequeNode tmp = d->tail;
 	while (tmp != NULL) {
-		if (tmp == item) {
+		if (tmp->value == item) {
 			return TRUE;
 		}
 		tmp = tmp->next;
 	}
 	return FALSE; /* item not found in deque */
 }
+

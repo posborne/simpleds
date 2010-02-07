@@ -85,7 +85,6 @@ START_TEST (test_deque_popleft) {
 	fail_unless(test_strings[0] == deque_popleft(d));
 	fail_unless(test_strings[1] == deque_popleft(d));
 	fail_unless(test_strings[2] == deque_popleft(d));
-	deque_free(d);
 }
 END_TEST
 
@@ -104,7 +103,7 @@ START_TEST (test_deque_remove) {
 	fail_unless(deque_remove(d, test_strings[1]) == test_strings[1]);
 	fail_unless(deque_count(d) == 2);
 	
-	fail_unless(deque_remove(d, test_strings[3]) == test_strings[3]);
+	fail_unless(deque_remove(d, test_strings[2]) == test_strings[2]);
 	fail_unless(deque_count(d) == 1);
 }
 END_TEST
@@ -167,12 +166,45 @@ START_TEST (test_deque_copy) {
 END_TEST
 
 START_TEST (test_deque_reverse) {
-	fail("Not Implemented");
+	char* test_strings[] = {"t1", "t2", "t3"};
+		Deque d = deque_create();
+		
+		fail_unless(deque_count(d) == 0);
+		
+		deque_append(d, test_strings[0]);
+		deque_append(d, test_strings[1]);
+		deque_append(d, test_strings[2]);
+		
+		fail_unless(deque_count(d) == 3);
+
+		/* do the reverse */
+		deque_reverse(d);
+		
+		fail_unless(deque_count(d) == 3);
+		fail_unless(deque_peek(d) == test_strings[0]);
+		fail_unless(deque_peekleft(d) == test_strings[2]);
+				
 }
 END_TEST
 
 START_TEST (test_deque_contains) {
-	fail("Not Implemented");
+	char* test_strings[] = {"t1", "t2", "t3"};
+	Deque d = deque_create();
+	
+	fail_unless(deque_count(d) == 0);
+	
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	
+	fail_unless(deque_count(d) == 3);
+	fail_unless(deque_contains(d, test_strings[0]));
+	fail_unless(deque_contains(d, test_strings[1]));
+	fail_unless(deque_contains(d, test_strings[2]));
+	fail_if(deque_contains(d, "bar"));
+	fail_if(deque_contains(d, "foo"));
+	
+	deque_free(d);
 }
 END_TEST
 
