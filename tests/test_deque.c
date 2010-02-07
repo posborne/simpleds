@@ -1,8 +1,14 @@
 #include <check.h>
+#include <string.h>
 #include "../src/deque.h"
 
+int8_t
+string_comparator(const void *a, const void *b) {
+	return strcmp((char*) a, (char*) b);
+}
+
 START_TEST (test_deque_create) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	fail_if(d == NULL);
 	fail_unless(d->number_items == 0);
 	fail_unless(d->head == NULL);
@@ -13,7 +19,7 @@ END_TEST
 
 
 START_TEST (test_deque_append) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	deque_append(d, test_strings[0]);
 	deque_append(d, test_strings[1]);
@@ -29,7 +35,7 @@ END_TEST
 
 
 START_TEST (test_deque_appendleft) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	deque_appendleft(d, test_strings[0]);
 	deque_appendleft(d, test_strings[1]);
@@ -44,7 +50,7 @@ START_TEST (test_deque_appendleft) {
 END_TEST
 
 START_TEST (test_deque_clear) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	deque_appendleft(d, test_strings[0]);
 	deque_appendleft(d, test_strings[1]);
@@ -60,7 +66,7 @@ START_TEST (test_deque_clear) {
 END_TEST
 
 START_TEST (test_deque_pop) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	deque_append(d, test_strings[0]);
 	deque_append(d, test_strings[1]);
@@ -75,7 +81,7 @@ START_TEST (test_deque_pop) {
 END_TEST
 
 START_TEST (test_deque_popleft) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	deque_append(d, test_strings[0]);
 	deque_append(d, test_strings[1]);
@@ -89,7 +95,7 @@ START_TEST (test_deque_popleft) {
 END_TEST
 
 START_TEST (test_deque_remove) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	char* notfound = "Not in there";
 	deque_append(d, test_strings[0]);
@@ -109,7 +115,7 @@ START_TEST (test_deque_remove) {
 END_TEST
 
 START_TEST (test_deque_rotate) {
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* ts[] = {"t1", "t2", "t3"};
 	deque_append(d, ts[0]);
 	deque_append(d, ts[1]);
@@ -136,7 +142,7 @@ END_TEST
 
 START_TEST (test_deque_count) {
 	char* test_strings[] = {"t1", "t2", "t3"};
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	
 	fail_unless(deque_count(d) == 0);
 	
@@ -151,7 +157,7 @@ END_TEST
 
 START_TEST (test_deque_copy) {
 	Deque dcopy;
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	char* test_strings[] = {"t1", "t2", "t3"};
 	deque_append(d, test_strings[0]);
 	deque_append(d, test_strings[1]);
@@ -167,7 +173,7 @@ END_TEST
 
 START_TEST (test_deque_reverse) {
 	char* test_strings[] = {"t1", "t2", "t3"};
-		Deque d = deque_create();
+		Deque d = deque_create(string_comparator);
 		
 		fail_unless(deque_count(d) == 0);
 		
@@ -189,7 +195,7 @@ END_TEST
 
 START_TEST (test_deque_contains) {
 	char* test_strings[] = {"t1", "t2", "t3"};
-	Deque d = deque_create();
+	Deque d = deque_create(string_comparator);
 	
 	fail_unless(deque_count(d) == 0);
 	

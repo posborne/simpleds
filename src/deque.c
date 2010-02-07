@@ -11,13 +11,46 @@
 #include <assert.h>
 #include "deque.h"
 
+/* The default comparator which simplies does a simple comparison based on
+ * memory address.  It is really only useful to compare if two pointers point
+ * to the same piece of data, beyond that less than or equal are not very
+ * useful.
+ */
+static int8_t
+default_comparator(const void * a, const void * b) {
+	if (a == b) {
+		return 0;
+	} else {
+		return a > b ? 1 : -1;
+	}
+}
 
 /* Create a deque and return a reference, if memory cannot be allocated for
  * the deque, NULL will be returned.
+ * 
+ * A comparison function is passed in.  Given two pointers a and b to the
+ * value of nodes in the deque the comparison function should meet the following
+ * criterion:
+ * 
+ * x = f(a,b) -> {x > 0 if a > b,
+ * 				  x < 0 if a < b,
+ * 	              x = 0 if a = b}
+ * 
+ * If the compare_func is NULL a default comparison function which only
+ * compares the memory address of the items will be used.
  */
 Deque
-deque_create() {
-	Deque d = malloc(sizeof(struct deque_node_t));
+deque_create(int8_t(*compare_func)(const void *, const void *)) {
+	Deque d = malloc(sizeof(struct deque_t));
+	
+	/* store a pointer to the comparison function */
+	if (compare_func == NULL) {
+		d->compare_func = default_comparator;
+	} else {
+		d->compare_func = compare_func;
+	}
+	
+	/* initialize the state of the rest of the deque */
 	if (d == NULL) {
 		return NULL;
 	} else {
@@ -185,7 +218,7 @@ deque_remove(Deque d, void* item) {
 	void* value;
 	DequeNode tmp = d->tail;
 	while (tmp != NULL) {
-		if (tmp->value == item) {
+		if ((d->compare_func)(tmp->value, item) == 0) {
 			value = tmp->value;
 			if (tmp->prev != NULL) {
 				tmp->prev->next = tmp->next;
@@ -291,7 +324,7 @@ Deque
 deque_copy(Deque d) {
 	Deque newDeque;
 	DequeNode tmp;
-	newDeque = deque_create();
+	newDeque = deque_create(d->compare_func);
 	tmp = d->head;
 	while (tmp != NULL) {
 		deque_append(newDeque, tmp->value);
@@ -324,7 +357,7 @@ uint8_t
 deque_contains(Deque d, void* item) {
 	DequeNode tmp = d->tail;
 	while (tmp != NULL) {
-		if (tmp->value == item) {
+		if ((d->compare_func)(tmp->value, item) == 0) {
 			return TRUE;
 		}
 		tmp = tmp->next;

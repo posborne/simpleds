@@ -24,28 +24,29 @@ main(void) {
 #include "../src/deque.h"
 #include <assert.h>
 
+
+int8_t
+string_comp(const void *a, const void *b) {
+	return strcmp((char*) a, (char*) b);
+}
+
 int main(void) {
-	Deque d = deque_create();
-	char* ts[] = {"t1", "t2", "t3"};
-	deque_append(d, ts[0]);
-	deque_append(d, ts[1]);
-	deque_append(d, ts[2]);
+	char* test_strings[] = {"t1", "t2", "t3"};
+	Deque d = deque_create(string_comp);
 	
-	/* slide to the right */
-	assert(deque_peek(d) == ts[2]);
-	deque_rotate(d, 1);
-	assert(deque_peek(d) == ts[1]);
+	assert(deque_count(d) == 0);
 	
-	/* slide to the left */
-	deque_rotate(d, -1);
-	assert(deque_peek(d) == ts[2]);
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
 	
-	/* slide two to the right */
-	deque_rotate(d, 2);
-	assert(deque_peek(d) == ts[0]);
+	assert(deque_count(d) == 3);
+	assert(deque_contains(d, test_strings[0]));
+	assert(deque_contains(d, test_strings[1]));
+	assert(deque_contains(d, test_strings[2]));
+	assert(!deque_contains(d, "bar"));
+	assert(!deque_contains(d, "foo"));
 	
-	/* slide two again */
-	deque_rotate(d, 2);
-	assert(deque_peek(d) == ts[1]);
+	deque_free(d);
 }
 #endif

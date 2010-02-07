@@ -19,12 +19,13 @@ struct deque_t {
 	struct deque_node_t *head;
 	struct deque_node_t *tail;
 	uint32_t number_items;
+	int8_t(*compare_func)(const void *, const void *);
 };
 
 typedef struct deque_node_t *DequeNode;
 typedef struct deque_t *Deque;
 
-Deque    deque_create();
+Deque    deque_create(int8_t(*compare_func)(const void*, const void*));
 void     deque_free(Deque d);
 uint8_t  deque_append(Deque d, void* item);
 uint8_t  deque_appendleft(Deque d, void* item);
