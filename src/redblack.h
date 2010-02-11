@@ -27,6 +27,9 @@
 
 #include <stdint.h>
 
+#define TRUE  1
+#define FALSE 0
+
 enum redblack_iteration_order {
 	REDBLACK_ITERATE_PREORDER,
 	REDBLACK_ITERATE_INORDER,
@@ -48,6 +51,7 @@ typedef struct redblack_iterator {
 
 typedef struct redblack_tree {
 	RedblackNode root;
+	RedblackNode nil; /* nil node for this tree */
 	uint8_t(*compare_func)(const void*, const void*);
 } *RedblackTree;
 
