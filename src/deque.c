@@ -26,7 +26,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <stdio.h>
 #include "deque.h"
 
 /* The default comparator which simplies does a simple comparison based on
