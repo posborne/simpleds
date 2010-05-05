@@ -40,7 +40,11 @@ under a very pervasive MIT-style license, we only ask that the header for each o
 the files remains intact.
 
 For building and working on the project, we use the scons build system.  Read up
-on scons and checkout out the SConstruct file.
+on scons and checkout out the SConstruct file.  To build the tests you will need
+the check unit testing library on your system.  If you are on ubuntu 9.10+ you 
+can simply run:
+
+    $ sudo apt-get install check
 
 == CONTACT ==
 
