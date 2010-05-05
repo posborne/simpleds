@@ -26,6 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 #include "deque.h"
 
 /* The default comparator which simplies does a simple comparison based on
@@ -355,9 +356,9 @@ void
 deque_reverse(Deque d) {
 	DequeNode currNode;
 	DequeNode nextNode;
-	currNode = d->head;
-	while (currNode == NULL) {
-		nextNode = currNode->next;
+	currNode = d->tail;
+	while (currNode != NULL) {
+	    nextNode = currNode->next;
 		currNode->next = currNode->prev;
 		currNode->prev = nextNode;
 		currNode = nextNode;

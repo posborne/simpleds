@@ -195,24 +195,28 @@ START_TEST (test_deque_copy) {
 END_TEST
 
 START_TEST (test_deque_reverse) {
-	char* test_strings[] = {"t1", "t2", "t3"};
-		Deque d = deque_create(string_comparator);
-		
-		fail_unless(deque_count(d) == 0);
-		
-		deque_append(d, test_strings[0]);
-		deque_append(d, test_strings[1]);
-		deque_append(d, test_strings[2]);
-		
-		fail_unless(deque_count(d) == 3);
-
-		/* do the reverse */
-		deque_reverse(d);
-		
-		fail_unless(deque_count(d) == 3);
-		fail_unless(deque_peek(d) == test_strings[0]);
-		fail_unless(deque_peekleft(d) == test_strings[2]);
-				
+	char* test_strings[] = {"t1", "t2", "t3", "t2"};
+	Deque d = deque_create(string_comparator);
+        
+	fail_unless(deque_count(d) == 0);
+	
+	deque_append(d, test_strings[0]);
+	deque_append(d, test_strings[1]);
+	deque_append(d, test_strings[2]);
+	deque_append(d, test_strings[3]);
+	
+	fail_unless(deque_count(d) == 4);
+	fail_unless(deque_peek(d) == test_strings[3]);
+	fail_unless(deque_peekleft(d) == test_strings[0]);
+	
+	/* do the reverse */
+	deque_reverse(d);
+	
+	fail_unless(deque_count(d) == 4);
+	fail_unless(deque_pop(d) == test_strings[0]);
+	fail_unless(deque_pop(d) == test_strings[1]);
+	fail_unless(deque_pop(d) == test_strings[2]);
+	fail_unless(deque_pop(d) == test_strings[3]);
 }
 END_TEST
 
