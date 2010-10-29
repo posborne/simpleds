@@ -6,3 +6,4 @@ env = Environment(CC='gcc',
 
 dslib = env.StaticLibrary('build/simpleds', source=glob.glob('src/*.c'))
 env.Program('runtests', source=glob.glob('tests/*.c') + dslib)
+env.Program('redblack', source=['src/redblack.c'])

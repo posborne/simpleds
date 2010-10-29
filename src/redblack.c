@@ -39,22 +39,39 @@
 #include <malloc.h>
 #include "redblack.h"
 
+#define TEST_REDBLACK_INVARIANTS 0
+
 /* We create a nil node in order to maintain red-black trees invariants */
-static inline RedblackNode redblack_create_nil() {
-    RedblackNode nil = malloc(sizeof(struct redblack_node));
+static inline RedblackNode* redblack_create_nil() {
+    RedblackNode* nil = malloc(sizeof(RedblackNode));
     nil->left = NULL;
     nil->right = NULL;
-    nil->red = FALSE; /* nil nodes are always black */
+    nil->color = REDBLACK_BLACK; /* nil nodes are always black */
+    nil->value = NULL;
     return nil;
+}
+
+/* Allocate a redblack node (all new nodes in tree start red) */
+static inline RedblackNode* redblack_create_node(void *value) {
+    RedblackNode *node = malloc(sizeof(struct redblack_node));
+    node->left = NULL;
+    node->right = NULL;
+    node->color = REDBLACK_RED;
+    return node;
+}
+
+static inline void redblack_handle_reorient(RedblackTree *tree) {
+
 }
 
 /* Create an empty redblack tree with the specified comparison function
  * 
  * A reference to the newly created tree will be returned.  If memory cannot
- * be allocated, NULL will be returned.s
+ * be allocated, NULL will be returned.
  */
-RedblackTree redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
-    RedblackTree tree;
+RedblackTree*
+redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
+    RedblackTree* tree;
     tree = malloc(sizeof(struct redblack_node));
     if (tree == NULL) {
         return NULL;
@@ -70,51 +87,88 @@ RedblackTree redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
  * 
  * 
  */
-void redblack_insert(RedblackTree tree, void* item) {
+void
+redblack_insert(RedblackTree* tree, void* item) {
+    /* everything starts pointing to the root */
+    uint8_t comparison_val;
+    RedblackNode *current, *parent, *grandparent, *great_grandparent;
+    current = parent = grandparent = great_grandparent = tree->root;
 
+    /* store the item */
+    while ((comparison_val = tree->compare_func(item, current->value)) != 0) {
+        great_grandparent = grandparent; grandparent = parent; parent = current;
+        current = comparison_val < 0 ? current->left : current->right;
+
+        /* if there are two red children we need to fix something */
+        if (current->left->color == REDBLACK_RED && current->right->color == REDBLACK_RED) {
+            redblack_handle_reorient(tree);
+        }
+    }
+
+    /* Allocate memory for the new node */
+    current = redblack_create_node(item);
+
+    /* Attach the node to its parent */
+    if (tree->compare_func(item, parent->value) < 0) {
+        parent->left = current;
+    } else {
+        parent->right = current;
+    }
+
+    redblack_handle_reorient(tree);
 }
 
 /* 
  * 
  */
 void*
-redblack_remove(RedblackTree tree, void* item) {
+redblack_remove(RedblackTree* tree, void* item) {
 
 }
 
 /* Return TRUE (1) if the tree contains a node equal to the specified item
  * and FALSE (0) if not.
  */
-int8_t redblack_contains(RedblackTree tree, void* item) {
+int8_t
+redblack_contains(RedblackTree* tree, void* item) {
+    return 0; /* TODO */
+}
+
+/* 
+ * 
+ */
+RedblackIterator*
+redblack_iterator_create(RedblackTree* tree, uint8_t iteration_order) {
+    return NULL; /* TODO */
+}
+
+/* 
+ * 
+ */
+void redblack_iterator_free(RedblackIterator* iterator) {
+    return NULL; /* TODO */
+}
+
+/* 
+ * 
+ */
+void
+redblack_iterator_next(RedblackIterator* iterator) {
 
 }
 
 /* 
  * 
  */
-RedblackIterator redblack_iterator_create(RedblackTree tree,
-        uint8_t iteration_order) {
+int8_t redblack_iterator_hasnext(RedblackIterator* iterator) {
 
 }
 
-/* 
- * 
- */
-void redblack_iterator_free(RedblackIterator iterator) {
-
+#if 1
+#include <stdio.h>
+int main() {
+    printf("Starting some simple tests\r\n");
+    RedblackTree *tree = redblack_create(NULL);
+    return 0;
 }
-
-/* 
- * 
- */
-RedblackNode redblack_iterator_next(RedblackIterator iterator) {
-
-}
-
-/* 
- * 
- */
-int8_t redblack_iterator_hasnext(RedblackIterator iterator) {
-
-}
-
+#endif
