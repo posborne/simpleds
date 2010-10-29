@@ -40,13 +40,12 @@
 #include "redblack.h"
 
 /* We create a nil node in order to maintain red-black trees invariants */
-static inline RedblackNode
-redblack_create_nil() {
-	RedblackNode nil = malloc(sizeof(struct redblack_node));
-	nil->left = NULL;
-	nil->right = NULL;
-	nil->red = FALSE; /* nil nodes are always black */
-	return nil;
+static inline RedblackNode redblack_create_nil() {
+    RedblackNode nil = malloc(sizeof(struct redblack_node));
+    nil->left = NULL;
+    nil->right = NULL;
+    nil->red = FALSE; /* nil nodes are always black */
+    return nil;
 }
 
 /* Create an empty redblack tree with the specified comparison function
@@ -54,27 +53,25 @@ redblack_create_nil() {
  * A reference to the newly created tree will be returned.  If memory cannot
  * be allocated, NULL will be returned.s
  */
-RedblackTree
-redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
-	RedblackTree tree;
-	tree = malloc(sizeof(struct redblack_node));
-	if (tree == NULL) {
-		return NULL;
-	}
-	
-	tree->nil = redblack_create_nil(); /* create nil for this tree */
-	tree->root = tree->nil; /* start out with root as nil */
-	tree->compare_func = compare_func;
-	return tree;
+RedblackTree redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
+    RedblackTree tree;
+    tree = malloc(sizeof(struct redblack_node));
+    if (tree == NULL) {
+        return NULL;
+    }
+
+    tree->nil = redblack_create_nil(); /* create nil for this tree */
+    tree->root = tree->nil; /* start out with root as nil */
+    tree->compare_func = compare_func;
+    return tree;
 }
 
 /* Insert the specified item into the red-black tree in the correct place.
  * 
  * 
  */
-void
-redblack_insert(RedblackTree tree, void* item) {
-    
+void redblack_insert(RedblackTree tree, void* item) {
+
 }
 
 /* 
@@ -82,46 +79,42 @@ redblack_insert(RedblackTree tree, void* item) {
  */
 void*
 redblack_remove(RedblackTree tree, void* item) {
-	
+
 }
 
 /* Return TRUE (1) if the tree contains a node equal to the specified item
  * and FALSE (0) if not.
  */
-int8_t
-redblack_contains(RedblackTree tree, void* item) {
-	
+int8_t redblack_contains(RedblackTree tree, void* item) {
+
 }
 
 /* 
  * 
  */
-RedblackIterator
-redblack_iterator_create(RedblackTree tree, uint8_t iteration_order) {
-	
+RedblackIterator redblack_iterator_create(RedblackTree tree,
+        uint8_t iteration_order) {
+
 }
 
 /* 
  * 
  */
-void
-redblack_iterator_free(RedblackIterator iterator) {
-	
+void redblack_iterator_free(RedblackIterator iterator) {
+
 }
 
 /* 
  * 
  */
-RedblackNode
-redblack_iterator_next(RedblackIterator iterator) {
-	
+RedblackNode redblack_iterator_next(RedblackIterator iterator) {
+
 }
 
 /* 
  * 
  */
-int8_t
-redblack_iterator_hasnext(RedblackIterator iterator) {
-	
+int8_t redblack_iterator_hasnext(RedblackIterator iterator) {
+
 }
 

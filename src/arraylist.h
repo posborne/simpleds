@@ -43,10 +43,10 @@ typedef ListType *ArrayList;
 
 ArrayList arraylist_create(int8_t(*compare_func)(void*, void*));
 ArrayList arraylist_create_heap(int8_t(*compare_func)(void*, void*));
-ArrayList arraylist_create_heap_size(const uint32_t items, 
+ArrayList arraylist_create_heap_size(const uint32_t items,
 								     int8_t(*compare_func)(void*, void*));
 ArrayList arraylist_create_static(const void *dataPtr, const uint32_t size,
-								  int8_t(*compare_func)(void*, void*));
+        int8_t(*compare_func)(void*, void*));
 uint8_t arraylist_free(ArrayList list);
 void* arraylist_getitem(ArrayList list, const int index);
 uint8_t arraylist_append(ArrayList list, void *item);

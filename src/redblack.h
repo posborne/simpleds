@@ -31,41 +31,41 @@
 #define FALSE 0
 
 enum redblack_iteration_order {
-	REDBLACK_ITERATE_PREORDER,
-	REDBLACK_ITERATE_INORDER,
-	REDBLACK_ITERATE_POSTORDER
+    REDBLACK_ITERATE_PREORDER,
+    REDBLACK_ITERATE_INORDER,
+    REDBLACK_ITERATE_POSTORDER
 };
 
 typedef struct redblack_node {
-	uint8_t red; /* 0 if black, 1 if red */
-	struct redblack_node *left;
-	struct redblack_node *right;
-	struct redblack_node *parent;
-} *RedblackNode;
+    uint8_t red; /* 0 if black, 1 if red */
+    struct redblack_node *left;
+    struct redblack_node *right;
+    struct redblack_node *parent;
+}*RedblackNode;
 
 typedef struct redblack_iterator {
-	enum redblack_iteration_order iteration_order;
-	RedblackNode currentNode;
-	
-} *RedblackIterator;
+    enum redblack_iteration_order iteration_order;
+    RedblackNode currentNode;
+
+}*RedblackIterator;
 
 typedef struct redblack_tree {
-	RedblackNode root;
-	RedblackNode nil; /* nil node for this tree */
-	uint8_t(*compare_func)(const void*, const void*);
-} *RedblackTree;
+    RedblackNode root;
+    RedblackNode nil; /* nil node for this tree */
+    uint8_t(*compare_func)(const void*, const void*);
+}*RedblackTree;
 
 /* function prototypes */
 RedblackTree redblack_create(uint8_t(*compare_func)(const void*, const void*));
-void         redblack_insert(RedblackTree tree, void* item);
-void*        redblack_remove(RedblackTree tree, void* item);
-int8_t       redblack_contains(RedblackTree tree, void* item);
+void redblack_insert(RedblackTree tree, void* item);
+void* redblack_remove(RedblackTree tree, void* item);
+int8_t redblack_contains(RedblackTree tree, void* item);
 
 /* iterator functions */
-RedblackIterator redblack_iterator_create(RedblackTree tree, 
-										  uint8_t iteration_order);
-void             redblack_iterator_free(RedblackIterator iterator);
-RedblackNode     redblack_iterator_next(RedblackIterator iterator);
-int8_t 	         redblack_iterator_hasnext(RedblackIterator iterator);
+RedblackIterator redblack_iterator_create(RedblackTree tree,
+        uint8_t iteration_order);
+void redblack_iterator_free(RedblackIterator iterator);
+RedblackNode redblack_iterator_next(RedblackIterator iterator);
+int8_t redblack_iterator_hasnext(RedblackIterator iterator);
 
 #endif
