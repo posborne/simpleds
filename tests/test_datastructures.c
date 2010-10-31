@@ -33,6 +33,7 @@ main(void) {
 	int number_failed;
 	SRunner *sr = srunner_create(arraylist_suite());
 	srunner_add_suite(sr, deque_suite());
+	srunner_add_suite(sr, redblack_suite());
 	
 	srunner_run_all(sr, CK_NORMAL);
 	number_failed = srunner_ntests_failed(sr);

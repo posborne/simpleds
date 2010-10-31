@@ -46,7 +46,6 @@ typedef struct redblack_node {
 typedef struct redblack_iterator {
     enum redblack_iteration_order iteration_order;
     RedblackNode* currentNode;
-
 } RedblackIterator;
 
 typedef struct redblack_tree {
@@ -56,11 +55,11 @@ typedef struct redblack_tree {
     RedblackNode *parent;
     RedblackNode *grandparent;
     RedblackNode *great_grandparent;
-    uint8_t(*compare_func)(const void*, const void*);
+    int8_t(*compare_func)(const void*, const void*);
 } RedblackTree;
 
 /* function prototypes */
-RedblackTree* redblack_create(uint8_t(*compare_func)(const void*, const void*));
+RedblackTree* redblack_create(int8_t(*compare_func)(const void*, const void*));
 void redblack_insert(RedblackTree *tree, void* item);
 void* redblack_remove(RedblackTree *tree, void* item);
 int8_t redblack_contains(RedblackTree *tree, void* item);

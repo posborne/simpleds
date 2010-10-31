@@ -13,5 +13,6 @@
 
 Suite* arraylist_suite(void);
 Suite* deque_suite(void);
+Suite* redblack_suite(void);
 
 #endif /* TESTS_H_ */

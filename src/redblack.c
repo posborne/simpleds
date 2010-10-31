@@ -51,6 +51,7 @@ static inline RedblackNode* redblack_create_nil() {
     return nil;
 }
 
+
 /* Allocate a redblack node (all new nodes in tree start red) */
 static inline RedblackNode* redblack_create_node(void *value) {
     RedblackNode *node = malloc(sizeof(struct redblack_node));
@@ -60,17 +61,69 @@ static inline RedblackNode* redblack_create_node(void *value) {
     return node;
 }
 
-static inline void redblack_handle_reorient(RedblackTree *tree) {
-
+#if 0
+/*
+ * Perform single or double rotation on the tree to put it in good state
+ *
+ * Because the result is attached to the parent, there are 4 cases.
+ */
+static inline RedblackNode* redblack_rotate(RedblackTree *tree, void *item, RedblackNode *parent,
+                                            RedblackNode *grandparent, RedblackNode *great_grandparent) {
+    int8_t tmp;
+    RedblackNode* pivot_node;
+    if (tree->compare_func(item, parent->value) > 0) {
+        tmp = tree->compare_func(item, parent->left);
+        if (tmp < 0) {
+            parent->left = redblack_rotate_with_left_child(tree, parent->left);
+        } else {
+            parent->left = redblack_rotate_with_right_child(tree, parent->left);
+        }
+        pivot_node = parent->left;
+    } else {
+        tmp = tree->compare_func(tree, parent->right);
+        if (tmp < 0) {
+            parent->right = redblack_rotate_with_left_child(tree, parent->right);
+        } else {
+            parent->right = redblack_rotate_with_right_child(tree, parent->right);
+        }
+        pivot_node = parent->right;
+    }
+    return pivot_node;
 }
 
+
+/* Internal inline function for perform reorientation of tree when an insertion
+ * is performed and some node has two red children.  In this case we must
+ * performs flips and rotations on the tree.
+ *
+ * We pass in temporary state used during insertion rather than storing
+ * it with the tree to save on space.
+ */
+static inline void redblack_handle_reorient(RedblackTree *tree, void *item,
+                                            RedblackNode *current, RedblackNode *parent,
+                                            RedblackNode *grandparent, RedblackNode *great_grandparent) {
+    current->color = REDBLACK_RED;
+    current->left->color = REDBLACK_BLACK;
+    current->right->color = REDBLACK_BLACK;
+
+    if (parent->color == REDBLACK_RED) {
+        grandparent->color = REDBLACK_RED;
+        if (tree->compare_func(item, grandparent->value) < 0) {
+            parent = redblack_rotate(tree, item, parent, grandparent, great_grandparent);
+        }
+        current = redblack_rotate(tree, item, parent, grandparent, great_grandparent);
+        current->color = REDBLACK_BLACK;
+    }
+    tree->root->color = REDBLACK_BLACK; /* INVARIANT: root always black */
+}
+#endif
 /* Create an empty redblack tree with the specified comparison function
  * 
  * A reference to the newly created tree will be returned.  If memory cannot
  * be allocated, NULL will be returned.
  */
 RedblackTree*
-redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
+redblack_create(int8_t(*compare_func)(const void*, const void*)) {
     RedblackTree* tree;
     tree = malloc(sizeof(struct redblack_node));
     if (tree == NULL) {
@@ -83,6 +136,7 @@ redblack_create(uint8_t(*compare_func)(const void*, const void*)) {
     return tree;
 }
 
+#if 0
 /* Insert the specified item into the red-black tree in the correct place.
  * 
  * 
@@ -101,7 +155,7 @@ redblack_insert(RedblackTree* tree, void* item) {
 
         /* if there are two red children we need to fix something */
         if (current->left->color == REDBLACK_RED && current->right->color == REDBLACK_RED) {
-            redblack_handle_reorient(tree);
+            redblack_handle_reorient(tree, item, current, parent, grandparent, great_grandparent);
         }
     }
 
@@ -115,15 +169,15 @@ redblack_insert(RedblackTree* tree, void* item) {
         parent->right = current;
     }
 
-    redblack_handle_reorient(tree);
+    redblack_handle_reorient(tree, item, current, parent, grandparent, great_grandparent);
 }
-
+#endif
 /* 
  * 
  */
 void*
 redblack_remove(RedblackTree* tree, void* item) {
-
+    return NULL;
 }
 
 /* Return TRUE (1) if the tree contains a node equal to the specified item
@@ -161,10 +215,10 @@ redblack_iterator_next(RedblackIterator* iterator) {
  * 
  */
 int8_t redblack_iterator_hasnext(RedblackIterator* iterator) {
-
+    return 0;
 }
 
-#if 1
+#if 0
 #include <stdio.h>
 int main() {
     printf("Starting some simple tests\r\n");
