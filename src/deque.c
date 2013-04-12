@@ -27,6 +27,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "deque.h"
+#ifndef DEQUE_STATIC
+#include <malloc.h>
+#endif /* DEQUE_STATIC */
 
 /* The default comparator which simplies does a simple comparison based on
  * memory address.  It is really only useful to compare if two pointers point
@@ -40,6 +43,58 @@ default_comparator(const void * a, const void * b) {
 	} else {
 		return a > b ? 1 : -1;
 	}
+}
+
+/* Initialize a deque that has been already allocated
+ *
+ * This is called automatically if deque_create() is being used to
+ * allocate the deque.
+ */
+void
+deque_init(Deque d, deque_comparater_t compare_func) {
+	assert(d != NULL);
+
+	/* store a pointer to the comparison function */
+	if (compare_func == NULL) {
+		d->compare_func = default_comparator;
+	} else {
+		d->compare_func = compare_func;
+	}
+	
+	/* initialize the state of the rest of the deque */
+	d->head = NULL;
+	d->tail = NULL;
+	d->number_items = 0;
+}
+
+
+#ifdef DEQUE_STATIC
+static struct deque_node_t *
+deque_alloc_node(Deque d) {
+	struct deque_node_t * node;
+	int i;
+	/* find the first unused node */		
+	while ((node = &d->nodes[i++])->in_use);
+	if (node != NULL)
+		node->in_use = true;
+	return node;
+}
+
+static void
+deque_free_node(struct deque_node_t * node) {
+	node->in_use = false;
+}
+#else
+#include <malloc.h>
+static struct deque_node_t *
+deque_alloc_node(Deque d) {
+	return (struct deque_node_t *)malloc(sizeof(struct deque_node_t));
+}
+
+static void
+deque_free_node(struct deque_node_t * node)
+{
+	free(node);
 }
 
 /* Create a deque and return a reference, if memory cannot be allocated for
@@ -57,26 +112,33 @@ default_comparator(const void * a, const void * b) {
  * compares the memory address of the items will be used.
  */
 Deque
-deque_create(int8_t(*compare_func)(const void *, const void *)) {
+deque_create(deque_comparater_t compare_func) {
 	Deque d = malloc(sizeof(struct deque_t));
-	
-	/* store a pointer to the comparison function */
-	if (compare_func == NULL) {
-		d->compare_func = default_comparator;
-	} else {
-		d->compare_func = compare_func;
+	if (d != NULL) {
+		deque_init(d, compare_func);
 	}
-	
-	/* initialize the state of the rest of the deque */
-	if (d == NULL) {
-		return NULL;
-	} else {
-		d->head = NULL;
-		d->tail = NULL;
-		d->number_items = 0;
-		return d;
-	}
+	return d;
 }
+
+
+/* Copy the deque and return a reference to the new deque
+ *
+ * This is a shallow copy, so only the deque container data structures are
+ * copied, not the values referenced.
+ */
+Deque
+deque_copy(Deque d) {
+    Deque newDeque;
+    DequeNode tmp;
+    newDeque = deque_create(d->compare_func);
+    tmp = d->head;
+    while (tmp != NULL) {
+        deque_append(newDeque, tmp->value);
+        tmp = tmp->next;
+    }
+    return newDeque;
+}
+#endif /* DEQUE_STATIC */
 
 /* Free the data allocated for the deque and all nodes */
 void
@@ -87,50 +149,60 @@ deque_free(Deque d) {
 
 /* Append the specified item to the right end of the deque (head).
  */
-uint8_t
+deque_result_t
 deque_append(Deque d, void* item) {
+	deque_result_t retcode;	
 	DequeNode newNode;
 	assert(d != NULL);
-	
+
 	/* allocate memory for the new node and put it in a valid state */
-	newNode = malloc(sizeof(struct deque_node_t));
-	newNode->prev = d->head;
-	newNode->next = NULL;
-	newNode->value = item;
+	newNode = deque_alloc_node(d);
+	if (newNode == NULL) {
+		retcode = DEQUE_ALLOC_ERROR;
+	} else {
+		newNode->prev = d->head;
+		newNode->next = NULL;
+		newNode->value = item;
 	
-	if (d->head != NULL) {
-		d->head->next = newNode;
+		if (d->head != NULL) {
+			d->head->next = newNode;
+		}
+		if (d->tail == NULL) {
+			d->tail = newNode; /* only one item */
+		}
+		d->head = newNode;
+		d->number_items++;
 	}
-	if (d->tail == NULL) {
-		d->tail = newNode; /* only one item */
-	}
-	d->head = newNode;
-	d->number_items++;
-	return DEQUE_SUCCESS;
+	return retcode;
 }
 
 /* Append the specified item to the left end of the deque (tail). 
  */
-uint8_t
+deque_result_t
 deque_appendleft(Deque d, void* item) {
 	DequeNode newNode;
+	deque_result_t retcode = DEQUE_SUCCESS;
 	assert(d != NULL);
-	
+
 	/* create the new node and put it in a valid state */
-	newNode = malloc(sizeof(struct deque_node_t));
-	newNode->next = d->tail;
-	newNode->prev = NULL;
-	newNode->value = item;
+	newNode = deque_alloc_node(d);
+	if (newNode == NULL) {
+		retcode = DEQUE_ALLOC_ERROR;
+	} else {
+		newNode->next = d->tail;
+		newNode->prev = NULL;
+		newNode->value = item;
 	
-	if (d->tail != NULL) {
-		d->tail->prev = newNode;
+		if (d->tail != NULL) {
+			d->tail->prev = newNode;
+		}
+		if (d->head == NULL) {
+			d->head = d->tail;
+		}
+		d->tail = newNode;
+		d->number_items++;
 	}
-	if (d->head == NULL) {
-		d->head = d->tail;
-	}
-	d->tail = newNode;
-	d->number_items++;
-	return DEQUE_SUCCESS;
+	return retcode;
 }
 
 /* Clear the specified deque, this will free all data structures related to the
@@ -138,14 +210,14 @@ deque_appendleft(Deque d, void* item) {
  * 
  * This operation is O(n) where n is the number of elements in the deque.
  */
-uint8_t
+deque_result_t
 deque_clear(Deque d) {
 	DequeNode tmp;
 	assert(d != NULL);
 	while (d->head != NULL) {
 		tmp = d->head;
 		d->head = tmp->next;
-		free(tmp);
+		deque_free_node(tmp);
 	}
 	d->head = NULL;
 	d->tail = NULL;
@@ -169,7 +241,7 @@ deque_pop(Deque d) {
 		d->head = prevHead->prev;
 		d->number_items--;
 		value = prevHead->value;
-		free(prevHead);
+		deque_free_node(prevHead);
 		return value;
 	}
 }
@@ -204,7 +276,7 @@ deque_popleft(Deque d) {
 		}
 		d->number_items--;
 		value = prevTail->value;
-		free(prevTail);
+		deque_free_node(prevTail);
 		return value;
 	}
 }
@@ -243,7 +315,7 @@ deque_remove(Deque d, void* item) {
 			if (tmp->next != NULL) {
 				tmp->next->prev = tmp->prev;
 			}
-			free(tmp);
+			deque_free_node(tmp);
 			d->number_items--;
 			return value;
 		}
@@ -330,24 +402,6 @@ deque_rotateleft(Deque d, uint32_t n) {
 uint32_t
 deque_count(Deque d) {
 	return d->number_items;
-}
-
-/* Copy the deque and return a reference to the new deque
- * 
- * This is a shallow copy, so only the deque container data structures are
- * copied, not the values referenced.
- */
-Deque
-deque_copy(Deque d) {
-	Deque newDeque;
-	DequeNode tmp;
-	newDeque = deque_create(d->compare_func);
-	tmp = d->head;
-	while (tmp != NULL) {
-		deque_append(newDeque, tmp->value);
-		tmp = tmp->next;
-	}
-	return newDeque;
 }
 
 /* Reverse the order of the items in the deque */
